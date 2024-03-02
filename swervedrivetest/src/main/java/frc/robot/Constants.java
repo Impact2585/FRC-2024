@@ -97,6 +97,9 @@ public final class Constants {
   public static final class PivotConstants{
     public static final int PivotMotorCanId = 31;
 
+    public static final double pivotSpeed = 0.3;
+
+    public static final double pivotLimitSlowdownFactor = 1.0; //
     public static final double pivotP = 0.5;
     public static final double pivotI = 0.01;
     public static final double pivotD = 0.1;

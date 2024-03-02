@@ -23,13 +23,13 @@ public class Climb extends SubsystemBase {
     public void deployArms() {
         System.out.println("Lifting arms...");
         leftClimber.set(ClimbConstants.climbSpeed);
-        rightClimber.set(ClimbConstants.climbSpeed);
+        rightClimber.set(-ClimbConstants.climbSpeed);
     }
 
     public void pullUp(){
         System.out.println("Pulling up...");
         leftClimber.set(-ClimbConstants.climbSpeed);
-        rightClimber.set(-ClimbConstants.climbSpeed);
+        rightClimber.set(ClimbConstants.climbSpeed);
     }
 
     public void stopClimb(){

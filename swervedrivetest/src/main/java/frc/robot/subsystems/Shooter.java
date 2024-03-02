@@ -22,27 +22,18 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if(shooterStatus == 2.0){
-            shooterLeftMotor.set(ShooterConstants.speakerSpeed);
-            shooterRightMotor.set(-ShooterConstants.speakerSpeed);
-        }
-        else if (shooterStatus == 1.0){
-            shooterLeftMotor.set(ShooterConstants.ampSpeed);
-            shooterRightMotor.set(-ShooterConstants.ampSpeed);
-        }
-        else{
-            shooterLeftMotor.set(0);
-            shooterRightMotor.set(0);
-        }
     }
 
     public void ampScoring() {
         if(shooterStatus != 1.0){
             shooterStatus = 1.0;
+            shooterLeftMotor.set(ShooterConstants.ampSpeed);
+            shooterRightMotor.set(-ShooterConstants.ampSpeed);
             System.out.println("Amp speed");
         }
         else{
             shooterStatus = 0.0;
+            this.stop();
             System.out.println("Shooter stopped");
         }
     }
@@ -50,11 +41,19 @@ public class Shooter extends SubsystemBase {
     public void speakerScoring(){
         if(shooterStatus != 2.0){
             shooterStatus = 2.0;
+            shooterLeftMotor.set(ShooterConstants.speakerSpeed);
+            shooterRightMotor.set(-ShooterConstants.speakerSpeed);
             System.out.println("Speaker speed");
         }
         else{
             shooterStatus = 0.0;
+            this.stop();
             System.out.println("Shooter stopped");
         }
+    }
+
+    public void stop(){
+        shooterLeftMotor.set(0);
+        shooterRightMotor.set(0);
     }
 }

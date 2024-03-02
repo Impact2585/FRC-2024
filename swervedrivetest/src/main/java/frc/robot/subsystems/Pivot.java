@@ -32,8 +32,24 @@ public class Pivot extends SubsystemBase {
         SmartDashboard.putNumber("position", pivotEncoder.getPosition());
     }
 
-    public void setMotor(double speed) {
+    public void setMotor(double speed){
         pivotMotor.set(speed);
+    }
+
+    public void raisePivot() {
+        pivotMotor.set(Math.min(
+            Math.abs(PivotConstants.highLimit - pivotEncoder.getPosition()) * PivotConstants.pivotLimitSlowdownFactor,
+            PivotConstants.pivotSpeed));
+    }
+
+    public void lowerPivot(){
+        pivotMotor.set(-Math.min(
+            Math.abs(PivotConstants.lowLimit - pivotEncoder.getPosition()) * PivotConstants.pivotLimitSlowdownFactor,
+            PivotConstants.pivotSpeed));
+    }
+
+    public void stopPivot(){
+        pivotMotor.set(0);
     }
 
     public double getEncoderMeters() {

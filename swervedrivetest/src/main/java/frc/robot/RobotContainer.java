@@ -115,22 +115,29 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));*/
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
+    m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
+    m_subController.rightBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
 
-    m_subController.povUp().whileTrue(new RunCommand(() -> m_climber.deployArms(), m_climber));
-    m_subController.povDown().whileTrue(new RunCommand(() -> m_climber.pullUp(), m_climber));
-    m_subController.povRight().whileTrue(new RunCommand(() -> m_climber.stopClimb(), m_climber));
+    m_subController.povUp().onTrue(new RunCommand(() -> m_climber.deployArms(), m_climber));
+    m_subController.povDown().onTrue(new RunCommand(() -> m_climber.pullUp(), m_climber));
+    m_subController.povUp().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
+    m_subController.povDown().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
 
+    m_subController.x().whileTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
+    m_subController.x().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    m_subController.b().whileTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
+    m_subController.b().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
     m_subController.y().onTrue(new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint));
-    m_subController.b().onTrue(new PivotPID(m_pivot, PivotConstants.ampScoreSetpoint));
-    m_subController.a().onTrue(new PivotPID(m_pivot, PivotConstants.defaultSetpoint));
+    m_subController.a().onTrue(new PivotPID(m_pivot, PivotConstants.ampScoreSetpoint));
 
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
     m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.ampScoring(), m_shooter));
 
-    m_subController.rightTrigger(0.1).onTrue(new RunCommand(() -> m_indexer.spinIndexer(), m_indexer));
-    m_subController.leftTrigger(0.1).onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
-
+    m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.spinIndexer(), m_indexer));
+    m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
+    m_subController.rightBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
+    m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
   }
 
   /**

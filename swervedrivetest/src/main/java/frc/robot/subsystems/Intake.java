@@ -15,36 +15,28 @@ public class Intake extends SubsystemBase {
     private double intakeStatus;
 
     public Intake() {
-        intakeStatus = 0.0;
         intakeLeftMotor.setSmartCurrentLimit(20);
         intakeRightMotor.setSmartCurrentLimit(20);
+        stopIntake();
     }
 
     @Override
     public void periodic() {
-        intakeLeftMotor.set(-IntakeConstants.maxSpeed * intakeStatus);
-        intakeRightMotor.set(IntakeConstants.maxSpeed * intakeStatus);
+
     }
 
     public void spinIn() {
-        if(intakeStatus != 1.0){
-            intakeStatus = 1.0;
-            System.out.println("Intake spinning inward");
-        }
-        else{
-            intakeStatus = 0.0;
-            System.out.println("Intake stopped");
-        }
+        intakeLeftMotor.set(IntakeConstants.maxSpeed);
+        intakeRightMotor.set(-IntakeConstants.maxSpeed);
     }
 
     public void spinOut(){
-        if(intakeStatus != -1.0){
-            intakeStatus = -1.0;
-            System.out.println("Intake outtaking!");
-        }
-        else{
-            intakeStatus = 0.0;
-            System.out.println("Intake stopped");
-        }
+        intakeLeftMotor.set(-IntakeConstants.maxSpeed);
+        intakeRightMotor.set(IntakeConstants.maxSpeed);
+    }
+
+    public void stopIntake(){
+        intakeLeftMotor.set(0);
+        intakeRightMotor.set(0);
     }
 }

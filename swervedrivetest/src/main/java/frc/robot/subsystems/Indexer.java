@@ -10,34 +10,23 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class Indexer extends SubsystemBase {
     Talon indexerMotor = new Talon(IndexerConstants.indexerPort);
 
-    double indexerStatus = 0.0;
-
     public Indexer() {
-
+        this.stopIndex();
     }
 
     @Override
     public void periodic() {
-        indexerMotor.set(indexerStatus * IndexerConstants.indexerSpeed);
     }
 
     public void spinIndexer() {
-        System.out.println("Indexing...");
-        if(indexerStatus != 1.0){
-            indexerStatus = 1.0;
-        }
-        else{
-            indexerStatus = 0.0;
-        }
+        indexerMotor.set(IndexerConstants.indexerSpeed);
     }
 
     public void reverseIndexer(){
-        System.out.println("Indexing halted...");
-        if(indexerStatus != -1.0){
-            indexerStatus = -1.0;
-        }
-        else{
-            indexerStatus = 0.0;
-        }
+        indexerMotor.set(-IndexerConstants.indexerSpeed);
+    }
+
+    public void stopIndex(){
+        indexerMotor.set(0);
     }
 }

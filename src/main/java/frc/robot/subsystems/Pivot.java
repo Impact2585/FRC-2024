@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pivot extends SubsystemBase {
     CANSparkMax pivotMotor = new CANSparkMax(PivotConstants.PivotMotorCanId, MotorType.kBrushless);
@@ -29,7 +29,7 @@ public class Pivot extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("position", pivotEncoder.getPosition());
+        SmartDashboard.putNumber("Pivot position", pivotEncoder.getPosition());
     }
 
     public void setMotor(double speed){

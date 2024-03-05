@@ -78,7 +78,7 @@ public final class Constants {
      * rearright turning = 8
      */
 
-    public static final double driveLimiter = 0.5;
+    public static final double driveLimiter = 1;
   }
 
   public static final class IntakeConstants{

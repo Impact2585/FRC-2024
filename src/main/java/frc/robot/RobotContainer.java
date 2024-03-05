@@ -9,9 +9,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -94,7 +93,12 @@ public class RobotContainer {
             m_robotDrive));
 
     m_chooser.setDefaultOption("Example Auto", this.exampleAuto());
-    m_chooser.addOption("Automomous 1", this.auto1());
+    m_chooser.addOption("Autonomous 1", this.auto1());
+    m_chooser.addOption("Autonomous 2", this.auto2());
+    m_chooser.addOption("Autonomous 3", this.auto3());
+    m_chooser.addOption("Autonomous 4", this.auto4());
+    m_chooser.addOption("Autonomous 5", this.auto5());
+    m_chooser.addOption("Autonomous 6", this.auto6());
 
     SmartDashboard.putData(m_chooser);
   }
@@ -114,6 +118,7 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));*/
+    
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
@@ -138,6 +143,7 @@ public class RobotContainer {
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
+    
   }
 
   /**
@@ -189,14 +195,69 @@ public class RobotContainer {
     
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(
-      swerveControllerCommand.andThen(
-      new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(
-        () -> m_robotDrive.drive(0, 0, 0, false, false))));
+        () -> m_robotDrive.drive(0, 0, 0, false, false));
   }
 
   public final Command auto1(){
+    // Create config for trajectory
+    TrajectoryConfig config = new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.kDriveKinematics);
+
+    // An example trajectory to follow. All units in meters.
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(-1, 0), new Translation2d(0, 1), new Translation2d(1, 0), new Translation2d(0, -1)),
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        config);
+
+    var thetaController = new ProfiledPIDController(
+        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+        exampleTrajectory,
+        m_robotDrive::getPose, // Functional interface to feed supplier
+        DriveConstants.kDriveKinematics,
+
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_robotDrive::setModuleStates,
+        m_robotDrive);
+
+    // Reset odometry to the starting pose of the trajectory.
+    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    
+    // Run path following command, then stop at the end.
+    return swerveControllerCommand.andThen(
+        () -> m_robotDrive.drive(0, 0, 0, false, false));
+  }
+  
+  public final Command auto2(){
     return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
   }
 
+  public final Command auto3(){
+    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public final Command auto4(){
+    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public final Command auto5(){
+    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public final Command auto6(){
+    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
+  }
   
 }

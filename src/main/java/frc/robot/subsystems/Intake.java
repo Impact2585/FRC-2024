@@ -9,14 +9,14 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class Intake extends SubsystemBase {
 
-    private CANSparkMax intakeLeftMotor = new CANSparkMax(IntakeConstants.leftIntakeMotorCanId, MotorType.kBrushless);
-    private CANSparkMax intakeRightMotor = new CANSparkMax(IntakeConstants.rightIntakeMotorCanId, MotorType.kBrushless);
+    private CANSparkMax intakeLowerMotor = new CANSparkMax(IntakeConstants.lowerIntakeMotorCanId, MotorType.kBrushless);
+    private CANSparkMax intakeUpperMotor = new CANSparkMax(IntakeConstants.upperIntakeMotorCanId, MotorType.kBrushless);
 
     private double intakeStatus;
 
     public Intake() {
-        intakeLeftMotor.setSmartCurrentLimit(20);
-        intakeRightMotor.setSmartCurrentLimit(20);
+        intakeLowerMotor.setSmartCurrentLimit(20);
+        intakeUpperMotor.setSmartCurrentLimit(20);
         stopIntake();
     }
 
@@ -26,17 +26,17 @@ public class Intake extends SubsystemBase {
     }
 
     public void spinIn() {
-        intakeLeftMotor.set(IntakeConstants.maxSpeed);
-        intakeRightMotor.set(-IntakeConstants.maxSpeed);
+        intakeLowerMotor.set(IntakeConstants.maxSpeed);
+        intakeUpperMotor.set(IntakeConstants.maxSpeed);
     }
 
     public void spinOut(){
-        intakeLeftMotor.set(-IntakeConstants.maxSpeed);
-        intakeRightMotor.set(IntakeConstants.maxSpeed);
+        intakeLowerMotor.set(-IntakeConstants.maxSpeed);
+        intakeUpperMotor.set(-IntakeConstants.maxSpeed);
     }
 
     public void stopIntake(){
-        intakeLeftMotor.set(0);
-        intakeRightMotor.set(0);
+        intakeLowerMotor.set(0);
+        intakeUpperMotor.set(0);
     }
 }

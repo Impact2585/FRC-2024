@@ -82,8 +82,8 @@ public final class Constants {
   }
 
   public static final class IntakeConstants{
-    public static final int leftIntakeMotorCanId = 11;
-    public static final int rightIntakeMotorCanId = 12;
+    public static final int lowerIntakeMotorCanId = 11;
+    public static final int upperIntakeMotorCanId = 12;
 
     public static final double maxSpeed = 0.5;
   }
@@ -191,9 +191,9 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
-    public static final double kPThetaController = 1;
+    public static final double kPXController = 0.5;
+    public static final double kPYController = 0.5;
+    public static final double kPThetaController = 1.2;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(

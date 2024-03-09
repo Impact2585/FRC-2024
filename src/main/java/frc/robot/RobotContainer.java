@@ -119,9 +119,9 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));*/
     
-    m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
+    m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
-    m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
+    m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
     m_subController.rightBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
 
     m_subController.povUp().onTrue(new RunCommand(() -> m_climber.deployArms(), m_climber));
@@ -139,9 +139,9 @@ public class RobotContainer {
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
     m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.ampScoring(), m_shooter));
 
-    m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.spinIndexer(), m_indexer));
+    m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
-    m_subController.rightBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
+    m_subController.rightBumper().onTrue(new RunCommand(() -> m_indexer.spinIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
     
   }
@@ -169,9 +169,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(-1, 0), new Translation2d(0, 1), new Translation2d(1, 0), new Translation2d(0, -1)),
+        List.of(new Translation2d(0, 1)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(1, 1, new Rotation2d(Math.PI)),
         config);
 
     var thetaController = new ProfiledPIDController(
@@ -211,9 +211,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(-1, 0), new Translation2d(0, 1), new Translation2d(1, 0), new Translation2d(0, -1)),
+        List.of(new Translation2d(0.5, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(0, 0, new Rotation2d(Math.PI)),
+        new Pose2d(1, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(

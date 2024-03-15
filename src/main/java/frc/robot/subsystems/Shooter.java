@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 public class Shooter extends SubsystemBase {
 
-    private Talon shooterLeftMotor = new Talon(ShooterConstants.shooterLeftPort);
-    private Talon shooterRightMotor = new Talon(ShooterConstants.shooterRightPort);
+    private Spark shooterTopMotor = new Spark(ShooterConstants.shooterTopPort);
+    private Spark shooterBottomMotor = new Spark(ShooterConstants.shooterBottomPort);
 
     private double shooterStatus;
 
@@ -24,36 +25,22 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
     }
 
-    public void ampScoring() {
-        if(shooterStatus != 1.0){
-            shooterStatus = 1.0;
-            shooterLeftMotor.set(ShooterConstants.ampSpeed);
-            shooterRightMotor.set(-ShooterConstants.ampSpeed);
-            System.out.println("Amp speed");
-        }
-        else{
-            shooterStatus = 0.0;
-            this.stop();
-            System.out.println("Shooter stopped");
-        }
+    public void goBackwards() {
+        //shooterStatus = 1.0;
+        shooterTopMotor.set(ShooterConstants.ampSpeed);
+        shooterBottomMotor.set(-ShooterConstants.ampSpeed);
+        System.out.println("Amp speed");
     }
 
     public void speakerScoring(){
-        if(shooterStatus != 2.0){
-            shooterStatus = 2.0;
-            shooterLeftMotor.set(ShooterConstants.speakerSpeed);
-            shooterRightMotor.set(-ShooterConstants.speakerSpeed);
-            System.out.println("Speaker speed");
-        }
-        else{
-            shooterStatus = 0.0;
-            this.stop();
-            System.out.println("Shooter stopped");
-        }
+        //shooterStatus = 2.0;
+        shooterTopMotor.set(-ShooterConstants.speakerSpeed);
+        shooterBottomMotor.set(ShooterConstants.speakerSpeed);
+        System.out.println("Speaker speed");
     }
 
-    public void stop(){
-        shooterLeftMotor.set(0);
-        shooterRightMotor.set(0);
+    public void stopShooter(){
+        shooterTopMotor.set(0);
+        shooterBottomMotor.set(0);
     }
 }

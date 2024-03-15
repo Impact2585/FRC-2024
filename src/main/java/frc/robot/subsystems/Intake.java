@@ -26,11 +26,13 @@ public class Intake extends SubsystemBase {
     }
 
     public void spinIn() {
+        System.out.println("spinning");
         intakeLowerMotor.set(IntakeConstants.maxSpeed);
         intakeUpperMotor.set(IntakeConstants.maxSpeed);
     }
 
     public void spinOut(){
+        System.out.println("spinning out");
         intakeLowerMotor.set(-IntakeConstants.maxSpeed);
         intakeUpperMotor.set(-IntakeConstants.maxSpeed);
     }

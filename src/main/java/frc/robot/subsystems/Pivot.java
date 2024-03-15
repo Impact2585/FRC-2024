@@ -18,13 +18,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pivot extends SubsystemBase {
     CANSparkMax pivotMotor = new CANSparkMax(PivotConstants.PivotMotorCanId, MotorType.kBrushless);
-    AbsoluteEncoder pivotEncoder;
+    RelativeEncoder pivotEncoder;
 
     public Pivot() {
-        pivotEncoder = pivotMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        pivotEncoder = pivotMotor.getEncoder();
         //pivotMotor.setInverted(true);
         pivotMotor.setIdleMode(IdleMode.kBrake);
-        pivotMotor.setSmartCurrentLimit(20);
+        pivotMotor.setSmartCurrentLimit(40);
     }
 
     @Override
@@ -37,15 +37,13 @@ public class Pivot extends SubsystemBase {
     }
 
     public void raisePivot() {
-        pivotMotor.set(Math.min(
-            Math.abs(PivotConstants.highLimit - pivotEncoder.getPosition()) * PivotConstants.pivotLimitSlowdownFactor,
-            PivotConstants.pivotSpeed));
+        pivotMotor.set(PivotConstants.pivotSpeed);
+        System.out.println("Pivot raising");
     }
 
     public void lowerPivot(){
-        pivotMotor.set(-Math.min(
-            Math.abs(PivotConstants.lowLimit - pivotEncoder.getPosition()) * PivotConstants.pivotLimitSlowdownFactor,
-            PivotConstants.pivotSpeed));
+        pivotMotor.set(-PivotConstants.pivotSpeed);
+        System.out.println("Pivot lowering");
     }
 
     public void stopPivot(){

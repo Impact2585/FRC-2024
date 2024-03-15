@@ -18,6 +18,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.PivotConstants;
 
 import frc.robot.commands.PivotPID;
+import frc.robot.commands.ProcessNote;
 
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
@@ -25,11 +26,14 @@ import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.AmpTrap;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
@@ -67,6 +71,8 @@ public class RobotContainer {
   private final Shooter m_shooter = new Shooter();
 
   private final Indexer m_indexer = new Indexer();
+
+  private final AmpTrap m_amptrap = new AmpTrap();
 
   SendableChooser<Command> m_chooser = new SendableChooser<>();
   // The driver's controller
@@ -119,6 +125,11 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));*/
     
+    m_driverController.y().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
+    m_driverController.y().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    m_driverController.a().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
+    m_driverController.a().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
@@ -129,15 +140,24 @@ public class RobotContainer {
     m_subController.povUp().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
     m_subController.povDown().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
 
-    m_subController.x().whileTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
-    m_subController.x().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    m_subController.b().whileTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
-    m_subController.b().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    m_subController.y().onTrue(new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint));
-    m_subController.a().onTrue(new PivotPID(m_pivot, PivotConstants.ampScoreSetpoint));
+    m_subController.x().onTrue(new RunCommand(() -> m_amptrap.intakeRoller(), m_amptrap));
+    m_subController.x().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
+    m_subController.b().onTrue(new RunCommand(() -> m_amptrap.outtakeRoller(), m_amptrap));
+    m_subController.b().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
+    m_subController.a().onTrue(new RunCommand(() -> m_amptrap.lowerElevator(), m_amptrap));
+    m_subController.a().onFalse(new RunCommand(() -> m_amptrap.stopElevator(), m_amptrap));
+    m_subController.y().onTrue(new RunCommand(() -> m_amptrap.raiseElevator(), m_amptrap));
+    m_subController.y().onFalse(new RunCommand(() -> m_amptrap.stopElevator(), m_amptrap));
 
-    m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
-    m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.ampScoring(), m_shooter));
+    m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.score(), m_amptrap));
+    m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.stopAll(), m_amptrap));
+
+    m_subController.start().onTrue(new RunCommand(() -> m_amptrap.resetAmptrapEncoder(), m_amptrap));
+
+    m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
+    m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
+    m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
+    m_subController.rightStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
 
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
@@ -167,12 +187,19 @@ public class RobotContainer {
     // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
+        new Pose2d(1, 0, new Rotation2d(Math.PI/4)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(0, 1)),
+        List.of(new Translation2d(1.5, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(1, 1, new Rotation2d(Math.PI)),
+        new Pose2d(2, 0, new Rotation2d(Math.PI/4)),
         config);
+
+    Trajectory secondTrajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, new Rotation2d()),
+      List.of(new Translation2d(0.5, 0)),
+      new Pose2d(1, 0, new Rotation2d(Math.PI/4)),
+      config
+    );
 
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
@@ -190,12 +217,29 @@ public class RobotContainer {
         m_robotDrive::setModuleStates,
         m_robotDrive);
 
+    SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
+        secondTrajectory,
+        m_robotDrive::getPose, // Functional interface to feed supplier
+        DriveConstants.kDriveKinematics,
+
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_robotDrive::setModuleStates,
+        m_robotDrive);
+
     // Reset odometry to the starting pose of the trajectory.
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
     
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(
-        () -> m_robotDrive.drive(0, 0, 0, false, false));
+
+    return new SequentialCommandGroup( 
+    new RunCommand(() -> m_shooter.speakerScoring()), 
+    swerveControllerCommand, 
+    new ProcessNote(m_intaker, m_indexer, 3),
+    swerveControllerCommand2,
+    new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
   }
 
   public final Command auto1(){

@@ -22,9 +22,11 @@ public class AmpTrap extends SubsystemBase {
     CANSparkMax rollerMotor = new CANSparkMax(AmptrapConstants.rollerCanID, MotorType.kBrushless);
     boolean canUp = true;
     boolean canDown = true;
+    double status = 1.0;
+    boolean locked = true;
 
     public AmpTrap() {
-        elevatorEncoder.setPosition(-5);
+        elevatorEncoder.setPosition(1);
         elevatorMotor.setInverted(true);
         //elevatorEncoder.setInverted(true);
         elevatorMotor.setIdleMode(IdleMode.kBrake);
@@ -35,15 +37,34 @@ public class AmpTrap extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Elevator position", elevatorEncoder.getPosition());
-        /* 
-        if(elevatorEncoder.getPosition() < AmptrapConstants.elevatorHighStop) canUp = false;
-        else canUp = true;
-        SmartDashboard.putBoolean("Elevator can go up?", canUp);
+        
+        if(elevatorEncoder.getPosition() > AmptrapConstants.elevatorHighStop) {
+            canUp = false;
+            if(status != 2 && locked) elevatorMotor.set(0);
+            System.out.println("Elevator at high point");
+            status = 2.0;
+        }
+        else {
+            canUp = true;
+            status = 1.0;
+        }
 
-        if(elevatorEncoder.getPosition() > AmptrapConstants.elevatorLowStop) canDown = false;
-        else canDown = true;
+        SmartDashboard.putBoolean("Elevator can go up?", canUp);
+        
+        if(elevatorEncoder.getPosition() < AmptrapConstants.elevatorLowStop) {
+            canDown = false;
+            if(status != 0 && locked) elevatorMotor.set(0);
+            System.out.println("Elevator at low point");
+            status = 0.0;
+        }
+        else {
+            canDown = true;
+            status = 1.0;
+        }
+
         SmartDashboard.putBoolean("Elevator can go down?", canDown);
-        */
+
+        SmartDashboard.putNumber("Elevator status", status);
     }
 
     public void setMotor(double speed){
@@ -51,13 +72,13 @@ public class AmpTrap extends SubsystemBase {
     }
 
     public void raiseElevator() {
-        //if(canUp) elevatorMotor.set(AmptrapConstants.elevatorSpeed);
-        elevatorMotor.set(AmptrapConstants.elevatorSpeed);
+        if(canUp || !locked) elevatorMotor.set(AmptrapConstants.elevatorSpeed);
+        System.out.println("Elevator raising");
     }
 
     public void lowerElevator(){
-        //if(canDown) elevatorMotor.set(-AmptrapConstants.elevatorSpeed);
-        elevatorMotor.set(-AmptrapConstants.elevatorSpeed);
+        if(canDown || !locked) elevatorMotor.set(-AmptrapConstants.elevatorSpeed);
+        System.out.println("Elevator lowering");
     }
 
     public void intakeRoller(){
@@ -82,7 +103,7 @@ public class AmpTrap extends SubsystemBase {
     }
 
     public void resetAmptrapEncoder(){
-        elevatorEncoder.setPosition(-5);
+        elevatorEncoder.setPosition(1);
     }
 
     public void score(){

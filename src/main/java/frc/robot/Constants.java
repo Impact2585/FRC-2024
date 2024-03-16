@@ -124,7 +124,7 @@ public final class Constants {
     public static final int shooterBottomPort = 3;
 
     public static final double speakerSpeed = 1;
-    public static final double ampSpeed = 0.5;
+    public static final double ampSpeed = 0.2;
   }
 
   public static final class AmptrapConstants{
@@ -133,10 +133,10 @@ public final class Constants {
 
     public static final double rollerSpeed = 0.5;
 
-    public static final double elevatorSpeed = 0.5;
+    public static final double elevatorSpeed = 0.3;
 
     public static final double elevatorLowStop = 0;
-    public static final double elevatorHighStop = -90;
+    public static final double elevatorHighStop = 110;
   }
 
   public static final class ModuleConstants {

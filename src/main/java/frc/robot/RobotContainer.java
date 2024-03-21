@@ -12,6 +12,8 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.wpilibj.XboxController;
 
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -98,7 +100,7 @@ public class RobotContainer {
                 true, true),
             m_robotDrive));
 
-    m_chooser.setDefaultOption("Example Auto", this.exampleAuto());
+    m_chooser.setDefaultOption("Example Auto", this.speakerAuto());
     m_chooser.addOption("Autonomous 1", this.auto1());
     m_chooser.addOption("Autonomous 2", this.auto2());
     m_chooser.addOption("Autonomous 3", this.auto3());
@@ -135,8 +137,8 @@ public class RobotContainer {
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
     m_subController.rightBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
 
-    m_subController.povUp().onTrue(new RunCommand(() -> m_climber.deployArms(), m_climber));
-    m_subController.povDown().onTrue(new RunCommand(() -> m_climber.pullUp(), m_climber));
+    m_subController.povUp().onTrue(new RunCommand(() -> m_climber.raiseClimb(), m_climber));
+    m_subController.povDown().onTrue(new RunCommand(() -> m_climber.lowerClimb(), m_climber));
     m_subController.povUp().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
     m_subController.povDown().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
 
@@ -152,7 +154,7 @@ public class RobotContainer {
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.score(), m_amptrap));
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.stopAll(), m_amptrap));
 
-    m_subController.start().onTrue(new RunCommand(() -> m_amptrap.resetAmptrapEncoder(), m_amptrap));
+    m_subController.start().onTrue(new RunCommand(() -> m_amptrap.unlockAmpTrap(), m_amptrap));
 
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
     m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
@@ -176,7 +178,7 @@ public class RobotContainer {
     return m_chooser.getSelected();
   }
 
-  public final Command exampleAuto(){
+  public final Command speakerAuto(){
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -187,17 +189,17 @@ public class RobotContainer {
     // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
-        new Pose2d(1, 0, new Rotation2d(Math.PI/4)),
+        new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1.5, 0)),
+        List.of(new Translation2d(1, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(2, 0, new Rotation2d(Math.PI/4)),
+        new Pose2d(2, 0, new Rotation2d(-Math.PI/8)),
         config);
 
     Trajectory secondTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(0, 0, new Rotation2d()),
-      List.of(new Translation2d(0.5, 0)),
-      new Pose2d(1, 0, new Rotation2d(Math.PI/4)),
+      new Pose2d(2, 0, new Rotation2d(-Math.PI/8)),
+      List.of(new Translation2d(2, -1)),
+      new Pose2d(1, -1, new Rotation2d(-Math.PI/8)),
       config
     );
 
@@ -236,9 +238,16 @@ public class RobotContainer {
 
     return new SequentialCommandGroup( 
     new RunCommand(() -> m_shooter.speakerScoring()), 
-    swerveControllerCommand, 
-    new ProcessNote(m_intaker, m_indexer, 3),
-    swerveControllerCommand2,
+    swerveControllerCommand, //move
+    new ProcessNote(m_intaker, m_indexer, 3), //shoot
+    new PivotPID(m_pivot, PivotConstants.intakeSetpoint), //aim shooter down
+    new RunCommand(() -> m_intaker.spinIn()), 
+    new RunCommand(() -> m_shooter.goBackwards()),
+    swerveControllerCommand2, //move and intake second note
+    new WaitCommand(2),
+    new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint), //aim shooter up
+    new RunCommand(() -> m_shooter.speakerScoring()),
+    new ProcessNote(m_intaker, m_indexer, 3), //shoot
     new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
   }
 

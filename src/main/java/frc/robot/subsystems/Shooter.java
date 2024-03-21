@@ -10,10 +10,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 public class Shooter extends SubsystemBase {
 
-    private Spark shooterTopMotor = new Spark(ShooterConstants.shooterTopPort);
-    private Spark shooterBottomMotor = new Spark(ShooterConstants.shooterBottomPort);
+    private TalonFX shooterTopMotor = new TalonFX(ShooterConstants.shooterTopID);
+    private TalonFX shooterBottomMotor = new TalonFX(ShooterConstants.shooterBottomID);
 
     private double shooterStatus;
 
@@ -29,7 +31,7 @@ public class Shooter extends SubsystemBase {
         //shooterStatus = 1.0;
         shooterTopMotor.set(ShooterConstants.ampSpeed);
         shooterBottomMotor.set(-ShooterConstants.ampSpeed);
-        System.out.println("Amp speed");
+        System.out.println("intaking into shooter...");
     }
 
     public void speakerScoring(){

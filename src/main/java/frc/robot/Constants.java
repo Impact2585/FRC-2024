@@ -107,21 +107,21 @@ public final class Constants {
     public static final double lowLimit = 0.0;
     public static final double highLimit = Math.PI/3;
 
-    public static final double defaultSetpoint = 0.1;
-    public static final double ampScoreSetpoint = 1.1;
+    public static final double scoringSetpoint = 0.0;
+    public static final double intakeSetpoint = -0.5;
     public static final double speakerScoreSetpoint = 0.85;
   }
 
   public static final class ClimbConstants{
-    public static final int leftClimberPort = 0;
-    public static final int rightClimberPort = 1;
+    public static final int leftClimberCanID = 51;
+    public static final int rightClimberCanID = 52;
 
     public static final double climbSpeed = 0.4;
   }
 
   public static final class ShooterConstants{
-    public static final int shooterTopPort = 2;
-    public static final int shooterBottomPort = 3;
+    public static final int shooterTopID = 2;
+    public static final int shooterBottomID = 3;
 
     public static final double speakerSpeed = 1;
     public static final double ampSpeed = 0.2;
@@ -132,7 +132,6 @@ public final class Constants {
     public static final int rollerCanID = 42;
 
     public static final double rollerSpeed = 0.5;
-
     public static final double elevatorSpeed = 0.3;
 
     public static final double elevatorLowStop = 0;

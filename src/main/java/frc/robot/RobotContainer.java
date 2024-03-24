@@ -43,6 +43,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.util.List;
 
+import edu.wpi.first.cameraserver.CameraServer;
+
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -85,6 +87,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    //CameraServer.startAutomaticCapture(0);
+    //CameraServer.startAutomaticCapture(1);
     // Configure the button bindings
     configureButtonBindings();
 
@@ -127,10 +131,10 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));*/
     
-    m_driverController.y().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
-    m_driverController.y().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    m_driverController.a().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
-    m_driverController.a().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    //m_driverController.y().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
+    //m_driverController.y().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    //m_driverController.a().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
+    //m_driverController.a().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
     
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
@@ -154,7 +158,8 @@ public class RobotContainer {
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.score(), m_amptrap));
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.stopAll(), m_amptrap));
 
-    m_subController.start().onTrue(new RunCommand(() -> m_amptrap.unlockAmpTrap(), m_amptrap));
+    m_subController.povLeft().onTrue(new RunCommand(() -> m_amptrap.unlock(), m_amptrap));
+    m_subController.povRight().onTrue(new RunCommand(() -> m_amptrap.lock(), m_amptrap));
 
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
     m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
@@ -175,7 +180,70 @@ public class RobotContainer {
    */
 
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    // Create config for trajectory
+    return null;
+    /* 
+    System.out.println("running auto");
+    TrajectoryConfig config = new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.kDriveKinematics);
+
+    // An example trajectory to follow. All units in meters.
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(0.5, 0)),      // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(1, 0, new Rotation2d(0)),
+        config);
+
+    Trajectory exampleTrajectory2 = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(-0.5, 0)),      // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(-1, 0, new Rotation2d(0)),
+        config);
+      
+    var thetaController = new ProfiledPIDController(
+        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+        exampleTrajectory,
+        m_robotDrive::getPose, // Functional interface to feed supplier
+        DriveConstants.kDriveKinematics,
+
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_robotDrive::setModuleStates,
+        m_robotDrive);
+
+    SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
+        exampleTrajectory2,
+        m_robotDrive::getPose, // Functional interface to feed supplier
+        DriveConstants.kDriveKinematics,
+
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_robotDrive::setModuleStates,
+        m_robotDrive);
+
+    // Reset odometry to the starting pose of the trajectory.
+    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    
+    // Run path following command, then stop at the end.
+    return new SequentialCommandGroup(swerveControllerCommand, 
+    new RunCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory2.getInitialPose())),
+    swerveControllerCommand2,
+    new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+    */
   }
 
   public final Command speakerAuto(){
@@ -264,9 +332,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(0.5, 0)),
+        List.of(new Translation2d(1, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(1, 0, new Rotation2d(0)),
+        new Pose2d(0, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(

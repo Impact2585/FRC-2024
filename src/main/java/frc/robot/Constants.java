@@ -78,14 +78,14 @@ public final class Constants {
      * rearright turning = 8
      */
 
-    public static final double driveLimiter = 1;
+    public static final double driveLimiter = 0.75;
   }
 
   public static final class IntakeConstants{
     public static final int lowerIntakeMotorCanId = 11;
     public static final int upperIntakeMotorCanId = 12;
 
-    public static final double maxSpeed = 0.25;
+    public static final double maxSpeed = 0.06;
   }
 
   public static final class IndexerConstants{
@@ -120,8 +120,8 @@ public final class Constants {
   }
 
   public static final class ShooterConstants{
-    public static final int shooterTopID = 2;
-    public static final int shooterBottomID = 3;
+    public static final int shooterTopID = 21;
+    public static final int shooterBottomID = 22;
 
     public static final double speakerSpeed = 1;
     public static final double ampSpeed = 0.2;
@@ -132,10 +132,10 @@ public final class Constants {
     public static final int rollerCanID = 42;
 
     public static final double rollerSpeed = 0.5;
-    public static final double elevatorSpeed = 0.3;
+    public static final double elevatorSpeed = 0.4;
 
-    public static final double elevatorLowStop = 0;
-    public static final double elevatorHighStop = 110;
+    public static final double elevatorLowStop = -10;
+    public static final double elevatorHighStop = 125;
   }
 
   public static final class ModuleConstants {
@@ -191,14 +191,14 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.2;
+    public static final double kDriveDeadband = 0.05;
 
     public static final int kSubControllerPort = 1;
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 

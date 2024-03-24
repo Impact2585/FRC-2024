@@ -40,13 +40,13 @@ public class PivotPID extends Command {
 
     @Override
     public void execute() {
-        double speed = pivotPid.calculate(pivotSubsystem.getEncoderMeters());
-        pivotSubsystem.setMotor(speed);
+        //double speed = pivotPid.calculate(pivotSubsystem.getEncoderMeters());
+        //pivotSubsystem.setMotor(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        pivotSubsystem.setMotor(0);
+        //pivotSubsystem.setMotor(0);
         System.out.println("PivotPID ended!");
     }
 

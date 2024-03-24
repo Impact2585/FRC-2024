@@ -23,7 +23,7 @@ public class AmpTrap extends SubsystemBase {
     boolean canUp = true;
     boolean canDown = true;
     double status = 1.0;
-    boolean locked = false;
+    boolean locked = true;
 
     public AmpTrap() {
         elevatorEncoder.setPosition(1);
@@ -37,11 +37,13 @@ public class AmpTrap extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Elevator position", elevatorEncoder.getPosition());
+
+        SmartDashboard.putBoolean("Elevator locked?", locked);
         
         if(elevatorEncoder.getPosition() > AmptrapConstants.elevatorHighStop) {
             canUp = false;
             if(status != 2 && locked) elevatorMotor.set(0);
-            if(status != 2) System.out.println("Elevator at high point");
+            if(status != 2 && locked) System.out.println("Elevator at high point");
             status = 2.0;
         }
         else {
@@ -54,7 +56,7 @@ public class AmpTrap extends SubsystemBase {
         if(elevatorEncoder.getPosition() < AmptrapConstants.elevatorLowStop) {
             canDown = false;
             if(status != 0 && locked) elevatorMotor.set(0);
-            if(status != 0) System.out.println("Elevator at low point");
+            if(status != 0 && locked) System.out.println("Elevator at low point");
             status = 0.0;
         }
         else {
@@ -102,8 +104,14 @@ public class AmpTrap extends SubsystemBase {
         //return elevatorEncoder.getPosition();
     }
 
-    public void unlockAmpTrap(){
+    public void unlock(){
         locked = false;
+        //elevatorEncoder.setPosition(1);
+    }
+
+    public void lock(){
+        locked = true;
+        elevatorEncoder.setPosition(1);
     }
 
     public void score(){

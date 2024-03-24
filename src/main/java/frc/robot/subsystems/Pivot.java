@@ -17,6 +17,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Pivot extends SubsystemBase {
+    /* 
     CANSparkMax pivotMotor = new CANSparkMax(PivotConstants.PivotMotorCanId, MotorType.kBrushless);
     RelativeEncoder pivotEncoder;
 
@@ -53,4 +54,5 @@ public class Pivot extends SubsystemBase {
     public double getEncoderMeters() {
         return pivotEncoder.getPosition();
     }
+    */
 }

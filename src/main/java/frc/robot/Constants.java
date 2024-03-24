@@ -136,6 +136,13 @@ public final class Constants {
 
     public static final double elevatorLowStop = -10;
     public static final double elevatorHighStop = 125;
+
+    public static final double eP = 1;
+    public static final double eI = 0;
+    public static final double eD = 0;
+
+    public static final double loweredPos = 0;
+    public static final double sourcePos = 65;
   }
 
   public static final class ModuleConstants {

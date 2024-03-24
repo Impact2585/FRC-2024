@@ -13,7 +13,7 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-
+import frc.robot.Constants.AmptrapConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -21,6 +21,7 @@ import frc.robot.Constants.PivotConstants;
 
 import frc.robot.commands.PivotPID;
 import frc.robot.commands.ProcessNote;
+import frc.robot.commands.AmptrapPID;
 
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
@@ -135,6 +136,9 @@ public class RobotContainer {
     //m_driverController.y().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
     //m_driverController.a().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
     //m_driverController.a().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+
+    //m_driverController.y().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.sourcePos));
+    //m_driverController.a().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.loweredPos));
     
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
@@ -182,7 +186,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     return null;
-    /* 
+    /*
     System.out.println("running auto");
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -195,16 +199,8 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(0.5, 0)),      // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(1, 0, new Rotation2d(0)),
-        config);
-
-    Trajectory exampleTrajectory2 = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(-0.5, 0)),      // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(-1, 0, new Rotation2d(0)),
+        List.of(new Translation2d(1, 0), new Translation2d(1, -1)),      // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(0, -1, new Rotation2d(0)),
         config);
       
     var thetaController = new ProfiledPIDController(
@@ -223,26 +219,11 @@ public class RobotContainer {
         m_robotDrive::setModuleStates,
         m_robotDrive);
 
-    SwerveControllerCommand swerveControllerCommand2 = new SwerveControllerCommand(
-        exampleTrajectory2,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
     // Reset odometry to the starting pose of the trajectory.
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
     
     // Run path following command, then stop at the end.
-    return new SequentialCommandGroup(swerveControllerCommand, 
-    new RunCommand(() -> m_robotDrive.resetOdometry(exampleTrajectory2.getInitialPose())),
-    swerveControllerCommand2,
-    new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+    return swerveControllerCommand.andThen(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
     */
   }
 

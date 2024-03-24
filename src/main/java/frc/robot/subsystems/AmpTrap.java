@@ -99,9 +99,8 @@ public class AmpTrap extends SubsystemBase {
         elevatorMotor.set(0);
     }
 
-    public double getEncoderMeters() {
-        return 0.0;
-        //return elevatorEncoder.getPosition();
+    public double getEncoderPos() {
+        return elevatorEncoder.getPosition();
     }
 
     public void unlock(){

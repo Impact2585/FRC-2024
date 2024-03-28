@@ -70,7 +70,13 @@ public class AmpTrap extends SubsystemBase {
     }
 
     public void setMotor(double speed){
+        if(Math.abs(speed) > AmptrapConstants.elevatorSpeed) speed = sign(speed) * AmptrapConstants.elevatorSpeed;
         elevatorMotor.set(speed);
+    }
+
+    public double sign(double x){
+        if(x < 0) return -1;
+        else return 1;
     }
 
     public void raiseElevator() {

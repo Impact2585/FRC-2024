@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import frc.robot.Constants.PivotConstants;
+import frc.robot.Constants.AmptrapConstants;
 
 import frc.robot.subsystems.AmpTrap;
 
@@ -26,7 +26,7 @@ public class AmptrapPID extends Command {
     public AmptrapPID(AmpTrap amptrapSubsystem, double setpoint) {
         this.amptrapSubsystem = amptrapSubsystem;
         this.elevatorPID = new PIDController(//
-                PivotConstants.pivotP, PivotConstants.pivotI, PivotConstants.pivotD);
+                AmptrapConstants.eP, AmptrapConstants.eI, AmptrapConstants.eD);
         this.elevatorPID.setTolerance(1);
         elevatorPID.setSetpoint(setpoint);
 

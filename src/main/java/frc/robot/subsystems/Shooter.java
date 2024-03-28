@@ -29,8 +29,8 @@ public class Shooter extends SubsystemBase {
 
     public void goBackwards() {
         //shooterStatus = 1.0;
-        shooterTopMotor.set(ShooterConstants.ampSpeed);
-        shooterBottomMotor.set(-ShooterConstants.ampSpeed);
+        shooterTopMotor.set(ShooterConstants.speakerSpeed);
+        shooterBottomMotor.set(-ShooterConstants.speakerSpeed);
         System.out.println("intaking into shooter...");
     }
 

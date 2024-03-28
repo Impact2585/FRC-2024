@@ -85,7 +85,7 @@ public final class Constants {
     public static final int lowerIntakeMotorCanId = 11;
     public static final int upperIntakeMotorCanId = 12;
 
-    public static final double maxSpeed = 0.06;
+    public static final double maxSpeed = 0.5;
   }
 
   public static final class IndexerConstants{
@@ -120,8 +120,8 @@ public final class Constants {
   }
 
   public static final class ShooterConstants{
-    public static final int shooterTopID = 21;
-    public static final int shooterBottomID = 22;
+    public static final int shooterTopID = 22;
+    public static final int shooterBottomID = 21;
 
     public static final double speakerSpeed = 1;
     public static final double ampSpeed = 0.2;
@@ -131,18 +131,18 @@ public final class Constants {
     public static final int elevatorCanID = 41;
     public static final int rollerCanID = 42;
 
-    public static final double rollerSpeed = 0.5;
+    public static final double rollerSpeed = 0.7;
     public static final double elevatorSpeed = 0.4;
 
     public static final double elevatorLowStop = -10;
-    public static final double elevatorHighStop = 125;
+    public static final double elevatorHighStop = 120;
 
-    public static final double eP = 1;
+    public static final double eP = 0.05;
     public static final double eI = 0;
     public static final double eD = 0;
 
     public static final double loweredPos = 0;
-    public static final double sourcePos = 65;
+    public static final double sourcePos = 50;
   }
 
   public static final class ModuleConstants {

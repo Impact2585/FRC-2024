@@ -44,6 +44,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.util.List;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.cameraserver.CameraServer;
 
 /*
@@ -105,15 +107,11 @@ public class RobotContainer {
                 true, true),
             m_robotDrive));
 
-    m_chooser.setDefaultOption("Example Auto", this.speakerAuto());
-    m_chooser.addOption("Autonomous 1", this.auto1());
-    m_chooser.addOption("Autonomous 2", this.auto2());
-    m_chooser.addOption("Autonomous 3", this.auto3());
-    m_chooser.addOption("Autonomous 4", this.auto4());
-    m_chooser.addOption("Autonomous 5", this.auto5());
-    m_chooser.addOption("Autonomous 6", this.auto6());
+    m_chooser.setDefaultOption("Autoline Auto", this.auto1());
+    m_chooser.addOption("Speaker Auto", this.speakerAuto());
 
     SmartDashboard.putData(m_chooser);
+    SignalLogger.stop();
   }
 
   /**
@@ -127,18 +125,15 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     m_driverController.rightBumper().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    /*new JoystickButton(m_driverController, getRightBumper())
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));*/
     
-    //m_driverController.y().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
-    //m_driverController.y().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    //m_driverController.a().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
-    //m_driverController.a().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+     //pivot
+    m_driverController.povUp().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
+    m_driverController.povUp().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    m_driverController.povDown().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
+    m_driverController.povDown().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
 
-    //m_driverController.y().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.sourcePos));
-    //m_driverController.a().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.loweredPos));
+    m_driverController.y().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.sourcePos));
+    m_driverController.a().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.loweredPos));
     
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
@@ -151,7 +146,7 @@ public class RobotContainer {
     m_subController.povDown().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
 
     m_subController.x().onTrue(new RunCommand(() -> m_amptrap.intakeRoller(), m_amptrap));
-    m_subController.x().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
+    //m_subController.x().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
     m_subController.b().onTrue(new RunCommand(() -> m_amptrap.outtakeRoller(), m_amptrap));
     m_subController.b().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
     m_subController.a().onTrue(new RunCommand(() -> m_amptrap.lowerElevator(), m_amptrap));
@@ -165,6 +160,7 @@ public class RobotContainer {
     m_subController.povLeft().onTrue(new RunCommand(() -> m_amptrap.unlock(), m_amptrap));
     m_subController.povRight().onTrue(new RunCommand(() -> m_amptrap.lock(), m_amptrap));
 
+    //shooter
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
     m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
     m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
@@ -185,46 +181,10 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // Create config for trajectory
-    return null;
-    /*
-    System.out.println("running auto");
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 0), new Translation2d(1, -1)),      // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(0, -1, new Rotation2d(0)),
-        config);
-      
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    //return null;
+    return m_chooser.getSelected();
     
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
-    */
+    
   }
 
   public final Command speakerAuto(){
@@ -240,15 +200,15 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 0)),
+        List.of(new Translation2d(0.5, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(2, 0, new Rotation2d(-Math.PI/8)),
+        new Pose2d(1, 0, new Rotation2d(0)),
         config);
 
     Trajectory secondTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(2, 0, new Rotation2d(-Math.PI/8)),
+      new Pose2d(2, 0, new Rotation2d(0)),
       List.of(new Translation2d(2, -1)),
-      new Pose2d(1, -1, new Rotation2d(-Math.PI/8)),
+      new Pose2d(1, -1, new Rotation2d(0)),
       config
     );
 
@@ -301,7 +261,7 @@ public class RobotContainer {
   }
 
   public final Command auto1(){
-    // Create config for trajectory
+    System.out.println("running auto");
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -310,14 +270,19 @@ public class RobotContainer {
 
     // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 0)),
-        // End 3 meters straight ahead of where we started, facing forward
+        List.of(new Translation2d(0.5, 0)),     
+        new Pose2d(1, 0, new Rotation2d(0)),
+        config);
+
+    Trajectory exampleTrajectory2 = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(1, 0, new Rotation2d(0)),
+        List.of(new Translation2d(0.5, 0)),  
         new Pose2d(0, 0, new Rotation2d(0)),
         config);
 
+    //exampleTrajectory.concatenate(exampleTrajectory2);
+      
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -338,28 +303,7 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
     
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(
-        () -> m_robotDrive.drive(0, 0, 0, false, false));
+    return swerveControllerCommand.andThen(new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
+    
   }
-  
-  public final Command auto2(){
-    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
-  }
-
-  public final Command auto3(){
-    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
-  }
-
-  public final Command auto4(){
-    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
-  }
-
-  public final Command auto5(){
-    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
-  }
-
-  public final Command auto6(){
-    return (new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint).andThen(()-> m_robotDrive.drive(0, 0, 0, false, false)));
-  }
-  
 }

@@ -32,6 +32,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.AmpTrap;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -127,18 +128,20 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     
      //pivot
-    m_driverController.povUp().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
-    m_driverController.povUp().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    m_driverController.povDown().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
-    m_driverController.povDown().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    //m_driverController.povUp().onTrue(new RunCommand(() -> m_pivot.raisePivot(), m_pivot));
+    //m_driverController.povUp().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    //m_driverController.povDown().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
+    //m_driverController.povDown().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
+    m_driverController.povUp().onTrue(new PivotPID(m_pivot, PivotConstants.speakerSetpoint));
+    m_driverController.povDown().onTrue(new PivotPID(m_pivot, 0));
 
     m_driverController.y().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.sourcePos));
     m_driverController.a().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.loweredPos));
     
-    m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
-    m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
-    m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
+    m_subController.rightBumper().onTrue(new RunCommand(() -> m_intaker.spinOut(), m_intaker));
     m_subController.rightBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
+    m_subController.leftBumper().onTrue(new RunCommand(() -> m_intaker.spinIn(), m_intaker));
+    m_subController.leftBumper().onFalse(new RunCommand(() -> m_intaker.stopIntake(), m_intaker));
 
     m_subController.povUp().onTrue(new RunCommand(() -> m_climber.raiseClimb(), m_climber));
     m_subController.povDown().onTrue(new RunCommand(() -> m_climber.lowerClimb(), m_climber));
@@ -146,7 +149,7 @@ public class RobotContainer {
     m_subController.povDown().onFalse(new RunCommand(() -> m_climber.stopClimb(), m_climber));
 
     m_subController.x().onTrue(new RunCommand(() -> m_amptrap.intakeRoller(), m_amptrap));
-    //m_subController.x().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
+    m_subController.x().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
     m_subController.b().onTrue(new RunCommand(() -> m_amptrap.outtakeRoller(), m_amptrap));
     m_subController.b().onFalse(new RunCommand(() -> m_amptrap.stopRoller(), m_amptrap));
     m_subController.a().onTrue(new RunCommand(() -> m_amptrap.lowerElevator(), m_amptrap));
@@ -161,9 +164,11 @@ public class RobotContainer {
     m_subController.povRight().onTrue(new RunCommand(() -> m_amptrap.lock(), m_amptrap));
 
     //shooter
-    m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
+    m_subController.leftBumper().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
+    m_subController.leftBumper().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
+    m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
     m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
-    m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
+    m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
     m_subController.rightStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
 
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
@@ -182,9 +187,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     //return null;
-    return m_chooser.getSelected();
-    
-    
+    return auto1();
   }
 
   public final Command speakerAuto(){
@@ -206,9 +209,9 @@ public class RobotContainer {
         config);
 
     Trajectory secondTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(2, 0, new Rotation2d(0)),
-      List.of(new Translation2d(2, -1)),
-      new Pose2d(1, -1, new Rotation2d(0)),
+      new Pose2d(1, 0, new Rotation2d(0)),
+      List.of(new Translation2d(0.5, 0)),
+      new Pose2d(0, 0, new Rotation2d(0)),
       config
     );
 
@@ -246,17 +249,27 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
 
     return new SequentialCommandGroup( 
-    new RunCommand(() -> m_shooter.speakerScoring()), 
+    new PivotPID(m_pivot, PivotConstants.speakerSetpoint),
+    new WaitCommand(1),
+    new InstantCommand(() -> m_shooter.speakerScoring(), m_shooter),
+    new WaitCommand(1),
+    new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
+    new PivotPID(m_pivot, 0),
+    new WaitCommand(2),
+    new InstantCommand(() -> m_intaker.spinIn(), m_intaker),
+    new InstantCommand(() -> m_shooter.goBackwards(), m_shooter),
     swerveControllerCommand, //move
-    new ProcessNote(m_intaker, m_indexer, 3), //shoot
-    new PivotPID(m_pivot, PivotConstants.intakeSetpoint), //aim shooter down
-    new RunCommand(() -> m_intaker.spinIn()), 
-    new RunCommand(() -> m_shooter.goBackwards()),
+    new WaitCommand(2),
+    new InstantCommand(() -> m_intaker.stopIntake(), m_intaker), 
+    new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
     swerveControllerCommand2, //move and intake second note
     new WaitCommand(2),
-    new PivotPID(m_pivot, PivotConstants.speakerScoreSetpoint), //aim shooter up
-    new RunCommand(() -> m_shooter.speakerScoring()),
-    new ProcessNote(m_intaker, m_indexer, 3), //shoot
+    new PivotPID(m_pivot, PivotConstants.speakerSetpoint),
+    new WaitCommand(2),
+    new InstantCommand(() -> m_shooter.speakerScoring(), m_shooter),
+    new WaitCommand(1),
+    new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
+    new InstantCommand(() -> m_intaker.stopIntake(), m_intaker),
     new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
   }
 

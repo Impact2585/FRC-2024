@@ -85,7 +85,7 @@ public final class Constants {
     public static final int lowerIntakeMotorCanId = 11;
     public static final int upperIntakeMotorCanId = 12;
 
-    public static final double maxSpeed = 0.5;
+    public static final double maxSpeed = 0.4;
   }
 
   public static final class IndexerConstants{
@@ -97,19 +97,17 @@ public final class Constants {
   public static final class PivotConstants{
     public static final int PivotMotorCanId = 31;
 
-    public static final double pivotSpeed = 0.3;
+    public static final double pivotSpeed = 0.2;
 
-    public static final double pivotLimitSlowdownFactor = 1.0; //
-    public static final double pivotP = 0.5;
-    public static final double pivotI = 0.01;
-    public static final double pivotD = 0.1;
+    //public static final double pivotLimitSlowdownFactor = 1.0; //
+    public static final double pivotP = 0.07;
+    public static final double pivotI = 0.0;
+    public static final double pivotD = 0.0;
 
     public static final double lowLimit = 0.0;
-    public static final double highLimit = Math.PI/3;
+    public static final double highLimit = 12.0;
 
-    public static final double scoringSetpoint = 0.0;
-    public static final double intakeSetpoint = -0.5;
-    public static final double speakerScoreSetpoint = 0.85;
+    public static final double speakerSetpoint = 11.5;
   }
 
   public static final class ClimbConstants{
@@ -124,18 +122,18 @@ public final class Constants {
     public static final int shooterBottomID = 21;
 
     public static final double speakerSpeed = 1;
-    public static final double ampSpeed = 0.2;
+    public static final double inSpeed = 0.1;
   }
 
   public static final class AmptrapConstants{
     public static final int elevatorCanID = 41;
     public static final int rollerCanID = 42;
 
-    public static final double rollerSpeed = 0.7;
+    public static final double rollerSpeed = 0.5;
     public static final double elevatorSpeed = 0.4;
 
-    public static final double elevatorLowStop = -10;
-    public static final double elevatorHighStop = 120;
+    public static final double elevatorLowStop = 0;
+    public static final double elevatorHighStop = 65;
 
     public static final double eP = 0.05;
     public static final double eI = 0;

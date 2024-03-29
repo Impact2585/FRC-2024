@@ -100,14 +100,14 @@ public final class Constants {
     public static final double pivotSpeed = 0.2;
 
     //public static final double pivotLimitSlowdownFactor = 1.0; //
-    public static final double pivotP = 0.07;
+    public static final double pivotP = 0.05;
     public static final double pivotI = 0.0;
     public static final double pivotD = 0.0;
 
     public static final double lowLimit = 0.0;
     public static final double highLimit = 12.0;
 
-    public static final double speakerSetpoint = 11.5;
+    public static final double speakerSetpoint = 11.25;
   }
 
   public static final class ClimbConstants{
@@ -133,7 +133,7 @@ public final class Constants {
     public static final double elevatorSpeed = 0.4;
 
     public static final double elevatorLowStop = 0;
-    public static final double elevatorHighStop = 65;
+    public static final double elevatorHighStop = 120;
 
     public static final double eP = 0.05;
     public static final double eI = 0;

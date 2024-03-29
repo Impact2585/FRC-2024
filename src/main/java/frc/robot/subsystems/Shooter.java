@@ -41,6 +41,11 @@ public class Shooter extends SubsystemBase {
         System.out.println("Speaker speed");
     }
 
+    public void outTakeShooter(){
+        shooterTopMotor.set(-ShooterConstants.inSpeed);
+        shooterBottomMotor.set(ShooterConstants.inSpeed);
+    }
+
     public void stopShooter(){
         shooterTopMotor.set(0);
         shooterBottomMotor.set(0);

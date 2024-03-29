@@ -91,7 +91,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    //CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(0);
     //CameraServer.startAutomaticCapture(1);
     // Configure the button bindings
     configureButtonBindings();
@@ -175,7 +175,8 @@ public class RobotContainer {
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
     m_subController.rightBumper().onTrue(new RunCommand(() -> m_indexer.spinIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
-    
+    m_subController.rightBumper().onTrue(new RunCommand(() -> m_shooter.outTakeShooter(), m_shooter));
+    m_subController.rightBumper().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
   }
 
   /**

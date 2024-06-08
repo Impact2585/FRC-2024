@@ -22,6 +22,7 @@ import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.PivotPID;
 import frc.robot.commands.ProcessNote;
 import frc.robot.commands.AmptrapPID;
+import frc.robot.commands.AutoPivotPID;
 
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Intake;
@@ -108,6 +109,8 @@ public class RobotContainer {
                 true, true),
             m_robotDrive));
 
+        //new RunCommand(() -> m_pivot.setMotor(0.3 * m_subController.getRightY()));
+        
     m_chooser.setDefaultOption("Autoline Auto", this.auto1());
     m_chooser.addOption("Speaker Auto", this.speakerAuto());
 
@@ -132,8 +135,8 @@ public class RobotContainer {
     //m_driverController.povUp().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
     //m_driverController.povDown().onTrue(new RunCommand(() -> m_pivot.lowerPivot(), m_pivot));
     //m_driverController.povDown().onFalse(new RunCommand(() -> m_pivot.stopPivot(), m_pivot));
-    m_driverController.povUp().onTrue(new PivotPID(m_pivot, PivotConstants.speakerSetpoint));
-    m_driverController.povDown().onTrue(new PivotPID(m_pivot, 0));
+    m_subController.rightStick().onTrue(new PivotPID(m_pivot, PivotConstants.speakerSetpoint));
+    m_subController.povLeft().onTrue(new PivotPID(m_pivot, 0));
 
     m_driverController.y().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.sourcePos));
     m_driverController.a().onTrue(new AmptrapPID(m_amptrap, AmptrapConstants.loweredPos));
@@ -160,16 +163,16 @@ public class RobotContainer {
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.score(), m_amptrap));
     m_subController.rightTrigger(0.5).onTrue(new RunCommand(() -> m_amptrap.stopAll(), m_amptrap));
 
-    m_subController.povLeft().onTrue(new RunCommand(() -> m_amptrap.unlock(), m_amptrap));
-    m_subController.povRight().onTrue(new RunCommand(() -> m_amptrap.lock(), m_amptrap));
+    m_driverController.povLeft().onTrue(new RunCommand(() -> m_amptrap.unlock(), m_amptrap));
+    m_driverController.povRight().onTrue(new RunCommand(() -> m_amptrap.lock(), m_amptrap));
 
     //shooter
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
     m_subController.leftStick().onTrue(new RunCommand(() -> m_shooter.speakerScoring(), m_shooter));
     m_subController.leftStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
-    m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
-    m_subController.rightStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
+    //m_subController.rightStick().onTrue(new RunCommand(() -> m_shooter.goBackwards(), m_shooter));
+    //m_subController.rightStick().onFalse(new RunCommand(() -> m_shooter.stopShooter(), m_shooter));
 
     m_subController.leftBumper().onTrue(new RunCommand(() -> m_indexer.reverseIndexer(), m_indexer));
     m_subController.leftBumper().onFalse(new RunCommand(() -> m_indexer.stopIndex(), m_indexer));
@@ -188,7 +191,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Create config for trajectory
     //return null;
-    return auto1();
+    //return auto1();
+    return m_chooser.getSelected();
   }
 
   public final Command speakerAuto(){
@@ -204,14 +208,14 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(0.5, 0)),
+        List.of(new Translation2d(0.7, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(1, 0, new Rotation2d(0)),
+        new Pose2d(1.4, 0, new Rotation2d(0)),
         config);
 
     Trajectory secondTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(1, 0, new Rotation2d(0)),
-      List.of(new Translation2d(0.5, 0)),
+      new Pose2d(1.4, 0, new Rotation2d(0)),
+      List.of(new Translation2d(0.7, 0)),
       new Pose2d(0, 0, new Rotation2d(0)),
       config
     );
@@ -250,25 +254,24 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
 
     return new SequentialCommandGroup( 
-    new PivotPID(m_pivot, PivotConstants.speakerSetpoint),
-    new WaitCommand(1),
-    new InstantCommand(() -> m_shooter.speakerScoring(), m_shooter),
-    new WaitCommand(1),
-    new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
-    new PivotPID(m_pivot, 0),
     new WaitCommand(2),
+    new AutoPivotPID(m_pivot, PivotConstants.speakerSetpoint),
+    new InstantCommand(() -> m_shooter.speakerScoring(), m_shooter),
+    new WaitCommand(0.5),
+    new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
+    new AutoPivotPID(m_pivot, 0),
     new InstantCommand(() -> m_intaker.spinIn(), m_intaker),
     new InstantCommand(() -> m_shooter.goBackwards(), m_shooter),
     swerveControllerCommand, //move
-    new WaitCommand(2),
+    new WaitCommand(1),
     new InstantCommand(() -> m_intaker.stopIntake(), m_intaker), 
     new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
     swerveControllerCommand2, //move and intake second note
-    new WaitCommand(2),
-    new PivotPID(m_pivot, PivotConstants.speakerSetpoint),
-    new WaitCommand(2),
+    new WaitCommand(0.75),
+    new AutoPivotPID(m_pivot, PivotConstants.speakerSetpoint),
     new InstantCommand(() -> m_shooter.speakerScoring(), m_shooter),
-    new WaitCommand(1),
+    new WaitCommand(0.5),
+    new AutoPivotPID(m_pivot, 0),
     new InstantCommand(() -> m_shooter.stopShooter(), m_shooter),
     new InstantCommand(() -> m_intaker.stopIntake(), m_intaker),
     new RunCommand(() -> m_robotDrive.drive(0, 0, 0, false, false)));
@@ -285,8 +288,8 @@ public class RobotContainer {
     // An example trajectory to follow. All units in meters.
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(new Translation2d(0.5, 0)),     
-        new Pose2d(1, 0, new Rotation2d(0)),
+        List.of(new Translation2d(0.55, 0)),     
+        new Pose2d(1.1, 0, new Rotation2d(0)),
         config);
 
     Trajectory exampleTrajectory2 = TrajectoryGenerator.generateTrajectory(

@@ -107,7 +107,7 @@ public final class Constants {
     public static final double lowLimit = 0.0;
     public static final double highLimit = 12.0;
 
-    public static final double speakerSetpoint = 11.25;
+    public static final double speakerSetpoint = 11.225;
   }
 
   public static final class ClimbConstants{

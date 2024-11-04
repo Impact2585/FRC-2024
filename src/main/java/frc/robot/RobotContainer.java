@@ -46,7 +46,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.util.List;
 
-import com.ctre.phoenix6.SignalLogger;
+//import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.cameraserver.CameraServer;
 
@@ -115,7 +115,7 @@ public class RobotContainer {
     m_chooser.addOption("Speaker Auto", this.speakerAuto());
 
     SmartDashboard.putData(m_chooser);
-    SignalLogger.stop();
+    //SignalLogger.stop();
   }
 
   /**
